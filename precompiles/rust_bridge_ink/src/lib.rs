@@ -224,8 +224,17 @@ mod rust_bridge {
             sig: Vec<u8>,
         ) -> bool {
             let _ = message; // consumed by real impl; unused in stub
-            assert!(pubkey.len() == 48, "bls_verify: pubkey must be 48 bytes (G1 compressed)");
-            assert!(sig.len() == 96, "bls_verify: signature must be 96 bytes (G2 compressed)");
+            // Return false for invalid lengths rather than panicking so callers
+            // can handle the result gracefully without a transaction revert.
+            if pubkey.len() != 48 || sig.len() != 96 {
+                return false;
+            }
+            // TODO: Replace with real BLS12-381 verification using the `blst`
+            // C library (available in the PolkaVM precompile via FFI) or a
+            // pure-Rust implementation such as `bls12_381` once `no_std`
+            // support stabilises.  The off-chain precompile in
+            // `../rust-bridge/src/handlers/bls.rs` does this correctly via
+            // `blst::min_pk`.
             true
         }
 
@@ -287,31 +296,37 @@ mod rust_bridge {
 
         // --- poseidon_hash ---
 
-        #[ink::test]
-        fn poseidon_hash_empty_is_stable() {
-            let c = contract();
-            let h1 = c.poseidon_hash(vec![]);
-            let h2 = c.poseidon_hash(vec![]);
-            assert_eq!(h1, h2);
-        }
-
+        /// Calling poseidon_hash([1, 2, 3]) twice must yield the same value,
+        /// and poseidon_hash([]) must return 0 (the sponge initial state word
+        /// with no input absorbed).
         #[ink::test]
         fn poseidon_hash_deterministic() {
             let c = contract();
-            let inputs = vec![1u128, 2, 3, 4, 5];
-            assert_eq!(c.poseidon_hash(inputs.clone()), c.poseidon_hash(inputs));
+
+            // Same input → same output
+            let h1 = c.poseidon_hash(vec![1u128, 2, 3]);
+            let h2 = c.poseidon_hash(vec![1u128, 2, 3]);
+            assert_eq!(h1, h2, "poseidon_hash must be deterministic");
+
+            // Empty input: no absorption step runs, state[0] starts at 0
+            assert_eq!(c.poseidon_hash(vec![]), 0, "poseidon_hash([]) must return 0");
         }
 
+        /// Different inputs must produce different digests and the output must
+        /// be a valid field element.
         #[ink::test]
-        fn poseidon_hash_different_inputs_differ() {
+        fn poseidon_hash_collision_resistance() {
             let c = contract();
             let h1 = c.poseidon_hash(vec![1u128, 2, 3]);
             let h2 = c.poseidon_hash(vec![1u128, 2, 4]);
-            assert_ne!(h1, h2);
+            assert_ne!(h1, h2, "distinct inputs must produce distinct hashes");
+            assert!(h1 < P, "output must be a valid field element");
+            assert!(h2 < P, "output must be a valid field element");
         }
 
+        /// MAX-value inputs must still produce a valid field element (no panic).
         #[ink::test]
-        fn poseidon_hash_output_in_field() {
+        fn poseidon_hash_large_inputs() {
             let c = contract();
             let h = c.poseidon_hash(vec![u128::MAX, u128::MAX]);
             assert!(h < P, "output must be a valid field element");
@@ -319,30 +334,27 @@ mod rust_bridge {
 
         // --- dot_product ---
 
+        /// Core correctness cases required by the specification.
         #[ink::test]
-        fn dot_product_basic() {
+        fn dot_product_correct() {
             let c = contract();
-            // [1,2,3] · [4,5,6] = 4+10+18 = 32
+
+            // [1,2,3] · [4,5,6] = 4 + 10 + 18 = 32
             assert_eq!(c.dot_product(vec![1, 2, 3], vec![4, 5, 6]), 32);
-        }
 
-        #[ink::test]
-        fn dot_product_mixed_signs() {
-            let c = contract();
-            // [-1,2] · [3,-4] = -3 + (-8) = -11
+            // [-1, 2] · [3, -4] = -3 + (-8) = -11
             assert_eq!(c.dot_product(vec![-1, 2], vec![3, -4]), -11);
-        }
 
-        #[ink::test]
-        fn dot_product_empty() {
-            let c = contract();
+            // Empty vectors → 0
             assert_eq!(c.dot_product(vec![], vec![]), 0);
         }
 
+        /// Single-element and all-negative cases.
         #[ink::test]
-        fn dot_product_single() {
+        fn dot_product_single_and_negatives() {
             let c = contract();
             assert_eq!(c.dot_product(vec![7], vec![-3]), -21);
+            assert_eq!(c.dot_product(vec![-2, -3], vec![-4, -5]), 23);
         }
 
         #[ink::test]
@@ -359,27 +371,42 @@ mod rust_bridge {
 
         // --- bls_verify ---
 
+        /// Correct lengths must return true; any wrong length must return false.
         #[ink::test]
-        fn bls_verify_valid_lengths_returns_true() {
+        fn bls_verify_length_check() {
             let c = contract();
-            let pubkey = vec![0u8; 48];
-            let message = b"hello".to_vec();
-            let sig = vec![0u8; 96];
-            assert!(c.bls_verify(pubkey, message, sig));
-        }
 
-        #[ink::test]
-        #[should_panic(expected = "pubkey must be 48 bytes")]
-        fn bls_verify_short_pubkey_panics() {
-            let c = contract();
-            c.bls_verify(vec![0u8; 32], vec![], vec![0u8; 96]);
-        }
+            // Valid: 48-byte pubkey, 96-byte sig → true
+            assert!(
+                c.bls_verify(vec![0u8; 48], b"hello world".to_vec(), vec![0u8; 96]),
+                "valid lengths must return true"
+            );
 
-        #[ink::test]
-        #[should_panic(expected = "signature must be 96 bytes")]
-        fn bls_verify_short_sig_panics() {
-            let c = contract();
-            c.bls_verify(vec![0u8; 48], vec![], vec![0u8; 32]);
+            // Wrong pubkey length → false
+            assert!(
+                !c.bls_verify(vec![0u8; 32], b"msg".to_vec(), vec![0u8; 96]),
+                "short pubkey must return false"
+            );
+            assert!(
+                !c.bls_verify(vec![0u8; 64], b"msg".to_vec(), vec![0u8; 96]),
+                "long pubkey must return false"
+            );
+
+            // Wrong sig length → false
+            assert!(
+                !c.bls_verify(vec![0u8; 48], b"msg".to_vec(), vec![0u8; 48]),
+                "short sig must return false"
+            );
+            assert!(
+                !c.bls_verify(vec![0u8; 48], b"msg".to_vec(), vec![0u8; 128]),
+                "long sig must return false"
+            );
+
+            // Both wrong → false
+            assert!(
+                !c.bls_verify(vec![0u8; 10], b"msg".to_vec(), vec![0u8; 10]),
+                "both wrong lengths must return false"
+            );
         }
 
         // --- benchmark_info ---
