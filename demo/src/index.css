@@ -1,0 +1,41 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:      #0d0d14;
+  --surface: #13131e;
+  --card:    #1a1a28;
+  --border:  #252536;
+  --pink:    #E6007A;
+  --teal:    #2DD4BF;
+  --orange:  #F97316;
+  --text:    #e2e8f0;
+  --dim:     #94a3b8;
+  --muted:   #4a5568;
+  --mono:    'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* Selection */
+::selection { background: #E6007A33; color: var(--text); }
