@@ -1,0 +1,21 @@
+{
+  "name": "polkadot-rust-bridge",
+  "version": "0.1.0",
+  "description": "Polkadot PolkaVM precompile bridge benchmarked against Solidity",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "benchmark": "hardhat run scripts/benchmark.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.4.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "ethers": "^6.0.0"
+  }
+}

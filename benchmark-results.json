@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-03-07T20:24:17.304Z",
+  "note": "rustGas = inner precompile exec gas; solidityGas = direct tx gas",
+  "results": [
+    {
+      "operation": "poseidonHash([42])",
+      "rustGas": 4726,
+      "solidityGas": 23043,
+      "speedupX": "4.88x"
+    },
+    {
+      "operation": "poseidonHash(n=10)",
+      "rustGas": 6257,
+      "solidityGas": 25780,
+      "speedupX": "4.12x"
+    },
+    {
+      "operation": "blsVerify(stub)",
+      "rustGas": 5329,
+      "solidityGas": 29710,
+      "speedupX": "5.58x"
+    },
+    {
+      "operation": "blsVerify(1kB msg)",
+      "rustGas": 5709,
+      "solidityGas": 69990,
+      "speedupX": "12.26x"
+    },
+    {
+      "operation": "dotProduct(n=5)",
+      "rustGas": 7782,
+      "solidityGas": 27573,
+      "speedupX": "3.54x"
+    },
+    {
+      "operation": "dotProduct(n=50)",
+      "rustGas": 32892,
+      "solidityGas": 64732,
+      "speedupX": "1.97x"
+    },
+    {
+      "operation": "dotProduct(n=100,neg)",
+      "rustGas": 60867,
+      "solidityGas": 139090,
+      "speedupX": "2.29x"
+    }
+  ]
+}

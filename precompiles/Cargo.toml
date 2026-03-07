@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [
+    "rust-bridge",
+]
+
+[profile.release]
+opt-level = "z"   # minimise binary size for PolkaVM
+lto = true
+codegen-units = 1
+panic = "abort"

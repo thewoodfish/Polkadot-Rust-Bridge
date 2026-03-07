@@ -1,0 +1,19 @@
+[package]
+name = "rust-bridge"
+version = "0.1.0"
+edition = "2021"
+description = "PolkaVM precompile: Rust logic exposed to Solidity via the Polkadot precompile interface"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ethabi          = "18"
+primitive-types = { version = "0.12", features = ["rlp"] }
+blst            = "0.3"
+sha3            = "0.10"
+hex             = "0.4"
+poseidon-rs     = "0.0"
+# ff_ce is poseidon-rs's own dep; we import it explicitly for PrimeField trait methods
+ff_ce           = { version = "0.11", package = "ff_ce" }
