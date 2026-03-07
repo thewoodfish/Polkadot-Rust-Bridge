@@ -2,6 +2,9 @@
 resolver = "2"
 members = [
     "rust-bridge",
+    # ink! contract — use `cargo contract build` from rust_bridge_ink/ for
+    # WASM compilation; `cargo check/test` work from workspace root as normal.
+    "rust_bridge_ink",
 ]
 
 [profile.release]

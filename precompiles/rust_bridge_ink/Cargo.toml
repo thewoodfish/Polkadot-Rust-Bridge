@@ -1,0 +1,38 @@
+[package]
+name = "rust_bridge_ink"
+version = "0.1.0"
+edition = "2021"
+authors = ["Polkadot Rust Bridge"]
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+]
+ink-as-dependency = []
+
+[dependencies]
+ink = { version = "5", default-features = false }
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.6", default-features = false, features = ["derive"] }
+
+# ink_e2e is only needed for on-chain end-to-end tests against a live node.
+# Unit tests (#[ink::test]) run with cargo test without this dep.
+# Uncomment to add e2e tests:
+# [dev-dependencies]
+# ink_e2e = { version = "5" }
+
+[profile.release]
+overflow-checks = false
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+overflow-checks = false
