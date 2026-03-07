@@ -22,15 +22,24 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 31337,
     },
-    // Polkadot Hub testnet (Westend Asset Hub).
+    // Polkadot Hub testnet — Westend Asset Hub (EVM chain ID 420420421).
+    // Both names point to the same network; `polkadotHub` is the short alias
+    // used in npm scripts and README examples.
     // Set POLKADOT_HUB_RPC_URL and DEPLOYER_PRIVATE_KEY in .env before using.
+    polkadotHub: {
+      url:      process.env.POLKADOT_HUB_RPC_URL ?? "",
+      accounts: process.env.DEPLOYER_PRIVATE_KEY
+                  ? [process.env.DEPLOYER_PRIVATE_KEY]
+                  : [],
+      // Westend Asset Hub EVM chain ID (420420421).
+      // Verify current value at: https://chainlist.org/?search=westend+asset+hub
+      chainId:  420420421,
+    },
     polkadotHubTestnet: {
       url:      process.env.POLKADOT_HUB_RPC_URL ?? "",
       accounts: process.env.DEPLOYER_PRIVATE_KEY
                   ? [process.env.DEPLOYER_PRIVATE_KEY]
                   : [],
-      // Westend Asset Hub EVM chain ID.
-      // Verify against: https://chainlist.org or the chain's runtime metadata.
       chainId:  420420421,
     },
   },

@@ -1,0 +1,9 @@
+{
+  "testnet": {
+    "network":       "Polkadot Hub Testnet (Westend Asset Hub)",
+    "chainId":       420420421,
+    "explorer":      "https://asset-hub-westend.subscan.io",
+    "xcmRustBridge": "",
+    "inkContract":   ""
+  }
+}

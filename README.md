@@ -103,6 +103,45 @@ to reach **5–50×**.
 
 ---
 
+## Live Deployment
+
+> Deploy status updates here after `npm run deploy` runs against Westend Asset Hub.
+
+| Contract | Network | Address |
+|---|---|---|
+| `XCMRustBridge.sol` | Polkadot Hub Testnet | _(not yet deployed)_ |
+| `rust_bridge_ink` | Polkadot Hub Testnet | _(not yet deployed)_ |
+
+Explorer: [asset-hub-westend.subscan.io](https://asset-hub-westend.subscan.io) · Chain ID: `420420421`
+
+---
+
+## Run It Yourself
+
+```bash
+# 1. Clone and install
+git clone https://github.com/thewoodfish/Polkadot-Rust-Bridge
+cd Polkadot-Rust-Bridge && npm install
+
+# 2. Configure environment
+cp .env.example .env
+# fill in POLKADOT_HUB_RPC_URL, DEPLOYER_PRIVATE_KEY, SUBSTRATE_SEED
+
+# 3. Build the ink! Wasm bundle
+cd precompiles/rust_bridge_ink && cargo contract build --release && cd ../..
+
+# 4. Deploy ink! contract to testnet (prints AccountId32 address)
+./scripts/deploy-ink.sh
+# set INK_CONTRACT_ADDRESS=0x<64 hex> in .env
+
+# 5. Deploy XCMRustBridge + smoke test + benchmark
+npx hardhat run scripts/deploy.ts --network polkadotHub
+# or:
+npm run deploy
+```
+
+---
+
 ## Documentation
 
 - [Architecture & design decisions](./docs/ARCHITECTURE.md)

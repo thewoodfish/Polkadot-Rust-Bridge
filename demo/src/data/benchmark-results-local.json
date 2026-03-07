@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-03-07T20:31:09.798Z",
+  "network": "hardhat",
+  "runs": 10,
+  "results": [
+    {
+      "operation": "poseidonHash(n=1)",
+      "rustPrecompileGas": 4726,
+      "pureSolidityGas": 23043,
+      "speedup": 4.88,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "poseidonHash(n=5)",
+      "rustPrecompileGas": 5406,
+      "pureSolidityGas": 24259,
+      "speedup": 4.49,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "poseidonHash(n=10)",
+      "rustPrecompileGas": 6257,
+      "pureSolidityGas": 25780,
+      "speedup": 4.12,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "blsVerify(32B msg)",
+      "rustPrecompileGas": 5329,
+      "pureSolidityGas": 30460,
+      "speedup": 5.72,
+      "note": "stub always returns true — mock values"
+    },
+    {
+      "operation": "blsVerify(256B msg)",
+      "rustPrecompileGas": 5414,
+      "pureSolidityGas": 39450,
+      "speedup": 7.29,
+      "note": "stub always returns true — mock values"
+    },
+    {
+      "operation": "blsVerify(1kB msg)",
+      "rustPrecompileGas": 5709,
+      "pureSolidityGas": 69960,
+      "speedup": 12.25,
+      "note": "stub always returns true — mock values"
+    },
+    {
+      "operation": "dotProduct(n=10)",
+      "rustPrecompileGas": 10569,
+      "pureSolidityGas": 31711,
+      "speedup": 3,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "dotProduct(n=50)",
+      "rustPrecompileGas": 32892,
+      "pureSolidityGas": 64732,
+      "speedup": 1.97,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "dotProduct(n=100)",
+      "rustPrecompileGas": 60867,
+      "pureSolidityGas": 106044,
+      "speedup": 1.74,
+      "note": "mock values — real speedup expected on PolkaVM"
+    },
+    {
+      "operation": "dotProduct(n=100, mixed)",
+      "rustPrecompileGas": 60867,
+      "pureSolidityGas": 139090,
+      "speedup": 2.29,
+      "note": "mock values — real speedup expected on PolkaVM"
+    }
+  ]
+}
