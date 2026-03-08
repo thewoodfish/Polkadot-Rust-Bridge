@@ -86,34 +86,30 @@ cargo build --release --target riscv32em-unknown-none-elf
 
 ## Benchmark Results
 
-Gas figures measured on local Hardhat network (10-run average).
-On a live PolkaVM node, Rust precompiles execute native RISC-V at significantly
-lower per-operation cost; real speedups for cryptographic workloads are expected
-to reach **5–50×**.
+Live on-chain measurements on Paseo Asset Hub (pallet-revive, PolkaVM native RISC-V).
+`rustPrecompileGas` = actual EVM→ink! call gas on-chain. `pureSolidityGas` = Hardhat EVM simulation of equivalent pure-Solidity logic.
 
-| Operation | Rust gas | Solidity gas | Speedup |
+| Operation | ink! v6 gas (live) | Solidity gas | Speedup |
 |---|---|---|---|
-| `poseidonHash(n=1)` | 4,726 | 23,043 | 4.9× |
-| `poseidonHash(n=10)` | 6,257 | 25,780 | 4.1× |
-| `blsVerify(32B msg)` | 5,329 | 30,460 | 5.7× |
-| `blsVerify(1kB msg)` | 5,709 | 69,960 | 12.3× |
-| `dotProduct(n=100)` | 60,867 | 106,044 | 1.7× |
+| `poseidonHash(n=1)` | 1,620 | 23,043 | **14.2×** |
+| `poseidonHash(n=5)` | 2,268 | 24,259 | **10.7×** |
+| `blsVerify(32B msg)` | 3,077 | 30,460 | **9.9×** |
+| `dotProduct(n=3)` | 2,755 | 24,500 | **8.9×** |
+| `dotProduct(n=10)` | 5,007 | 31,711 | **6.3×** |
 
-> Full results: [`benchmark-results.json`](./benchmark-results.json)
+> Full results: [`benchmark-results-testnet.json`](./benchmark-results-testnet.json)
 > Interactive chart: run `cd demo && npm run dev`
 
 ---
 
 ## Live Deployment
 
-> Deploy status updates here after `npm run deploy` runs against Westend Asset Hub.
-
 | Contract | Network | Address |
 |---|---|---|
-| `XCMRustBridge.sol` | Polkadot Hub Testnet | _(not yet deployed)_ |
-| `rust_bridge_ink` | Polkadot Hub Testnet | _(not yet deployed)_ |
+| `XCMRustBridge.sol` | Paseo Asset Hub (chain 420420417) | [`0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498`](https://blockscout-testnet.polkadot.io/address/0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498) |
+| `rust_bridge_ink` (ink! v6 / PolkaVM) | Paseo Asset Hub (chain 420420417) | [`0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5`](https://blockscout-testnet.polkadot.io/address/0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5) |
 
-Explorer: [asset-hub-westend.subscan.io](https://asset-hub-westend.subscan.io) · Chain ID: `420420421`
+Explorer: [blockscout-testnet.polkadot.io](https://blockscout-testnet.polkadot.io) · Chain ID: `420420417`
 
 ---
 
