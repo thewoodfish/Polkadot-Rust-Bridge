@@ -398,7 +398,7 @@ const CODE_ETHERS: Span[][] = [
   [],
   [s("const", KW), s(" provider = ", OP), s("new", KW), s(" ethers.", OP),
    s("JsonRpcProvider", FN), s("(", OP),
-   s('"wss://westend-asset-hub-rpc.polkadot.io"', ST), s(");", OP)],
+   s('"https://eth-rpc-testnet.polkadot.io/"', ST), s(");", OP)],
   [],
   [s("const", KW), s(" abi = [", OP)],
   [s('  "function directDotProduct(int128[], int128[]) returns (int128)"', ST), s(",", OP)],
@@ -727,7 +727,7 @@ export default function App() {
               { label: "PolkaVM / pallet-revive",   color: C.pink   },
               { label: "Rust 2021 edition",         color: C.teal   },
               { label: "Hardhat + ethers v6",       color: C.dim    },
-              { label: "ink! v5",                   color: C.green  },
+              { label: "ink! v6",                   color: C.green  },
             ].map(({ label, color }) => (
               <Badge key={label} label={label} color={color} />
             ))}
