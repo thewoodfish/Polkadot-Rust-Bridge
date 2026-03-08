@@ -69,8 +69,10 @@ mod rust_bridge {
     // -----------------------------------------------------------------------
 
     /// Addition mod P using u128, avoiding overflow by comparing before adding.
+    // a, b < P < 2^124, so a + b < 2^125 which fits in u128.
+    // The subtraction `s - P` only executes when s >= P, so it cannot underflow.
+    #[allow(clippy::arithmetic_side_effects)]
     fn fadd(a: u128, b: u128) -> u128 {
-        // Both a and b are already < P < 2^124, so a + b < 2^125 — fits in u128.
         let s = a.wrapping_add(b);
         if s >= P { s - P } else { s }
     }
@@ -79,6 +81,10 @@ mod rust_bridge {
     ///
     /// Uses 256-bit intermediate via two `u128` halves.  P < 2^124 so the
     /// product is at most (P-1)^2 < 2^248, which fits in two u128 words.
+    // Each half-product (lo * lo, lo * hi, etc.) is at most (2^64-1)^2 < 2^128,
+    // fitting exactly in u128.  The `* 48` at the end uses hi_hi < 2^64 and
+    // 48 < 2^6, so hi_hi * 48 < 2^70 — well within u128.
+    #[allow(clippy::arithmetic_side_effects)]
     fn fmul(a: u128, b: u128) -> u128 {
         // Split into 64-bit halves so the partial products stay in u128.
         let a_lo = a & 0xffff_ffff_ffff_ffff;
@@ -103,8 +109,7 @@ mod rust_bridge {
         let high128 = hi_hi.wrapping_add(mid_hi).wrapping_add(c0 as u128);
 
         // Reduce: x = high128 * 2^128 + sum0  (mod P)
-        // 2^128 mod P = (2^124 - 3 + 3 + 2^128 - 2^124) = 2^128 - 2^124 + ...
-        // Simpler: 2^128 = 16 * 2^124 = 16*(P+3) mod P = 48 mod P
+        // 2^128 mod P: since 2^124 = P+3, 2^128 = 16*(P+3) ≡ 48  (mod P)
         // So x ≡ sum0 + 48 * high128  (mod P)
         let contrib = fmul_small(high128, 48);
         let r = sum0.wrapping_add(contrib);
@@ -112,6 +117,10 @@ mod rust_bridge {
     }
 
     /// Multiply a field element by a small constant (fits in u64).
+    // a < P < 2^124; small <= 48 (max caller value).
+    // a_lo, a_hi < 2^64; s <= 48 — partial products < 2^70, fit in u128.
+    // hi_hi < 2^6 (since a_hi < 2^60 and s <= 48), so hi_hi * 48 < 2^12.
+    #[allow(clippy::arithmetic_side_effects)]
     fn fmul_small(a: u128, small: u64) -> u128 {
         let a_lo = a & 0xffff_ffff_ffff_ffff;
         let a_hi = a >> 64;
@@ -136,6 +145,8 @@ mod rust_bridge {
     /// One Poseidon full round over a width-2 state.
     ///
     /// Steps: AddRoundConstants → SubWords (x^5) → MixLayer (MDS [[1,1],[1,2]])
+    // rc_offset is always 0, 2, 4, or 6, so rc_offset + 1 never wraps.
+    #[allow(clippy::arithmetic_side_effects)]
     fn poseidon_round(state: [u128; 2], rc_offset: usize) -> [u128; 2] {
         // AddRoundConstants
         let s0 = fadd(state[0], RC[rc_offset]);

@@ -1,0 +1,12 @@
+# Pins the nightly toolchain used by `cargo contract build`.
+# Requirements:
+#   - edition2024 support in Cargo (stabilised in rustc 1.85 / ~Jan 2025)
+#     → need nightly ≥ 2025-01-xx
+#   - panic_immediate_abort not broken
+#     → nightly-2026-02-23+ (rustc 1.95-nightly) broke this; avoid it
+# nightly-2025-06-01 (rustc 1.89.0-nightly) satisfies both constraints
+# and is tested compatible with cargo-contract 4.1.x.
+[toolchain]
+channel = "nightly-2025-06-01"
+components = ["rust-src"]
+targets = ["wasm32-unknown-unknown"]

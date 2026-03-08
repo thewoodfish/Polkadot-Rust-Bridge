@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-07T20:31:09.798Z",
+  "timestamp": "2026-03-08T00:30:44.830Z",
   "network": "hardhat",
   "runs": 10,
   "results": [
@@ -27,22 +27,22 @@
     {
       "operation": "blsVerify(32B msg)",
       "rustPrecompileGas": 5329,
-      "pureSolidityGas": 30460,
-      "speedup": 5.72,
+      "pureSolidityGas": 30430,
+      "speedup": 5.71,
       "note": "stub always returns true — mock values"
     },
     {
       "operation": "blsVerify(256B msg)",
       "rustPrecompileGas": 5414,
-      "pureSolidityGas": 39450,
-      "speedup": 7.29,
+      "pureSolidityGas": 39390,
+      "speedup": 7.28,
       "note": "stub always returns true — mock values"
     },
     {
       "operation": "blsVerify(1kB msg)",
       "rustPrecompileGas": 5709,
-      "pureSolidityGas": 69960,
-      "speedup": 12.25,
+      "pureSolidityGas": 70020,
+      "speedup": 12.26,
       "note": "stub always returns true — mock values"
     },
     {

@@ -4,10 +4,11 @@
   "description": "Polkadot PolkaVM precompile bridge benchmarked against Solidity",
   "private": true,
   "scripts": {
-    "compile":   "hardhat compile",
-    "test":      "hardhat test",
-    "benchmark": "hardhat run scripts/benchmark.ts",
-    "deploy":    "hardhat run scripts/deploy.ts --network polkadotHubTestnet"
+    "compile":            "hardhat compile",
+    "test":               "hardhat test",
+    "benchmark":          "hardhat run scripts/benchmark.ts",
+    "deploy":             "hardhat run scripts/deploy.ts --network polkadotHub",
+    "benchmark:testnet":  "hardhat run scripts/benchmark-testnet.ts --network polkadotHub"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

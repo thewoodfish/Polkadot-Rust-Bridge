@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-07T20:31:09.798Z",
+  "timestamp": "2026-03-08T00:23:03.577Z",
   "network": "hardhat",
   "runs": 10,
   "results": [
@@ -41,8 +41,8 @@
     {
       "operation": "blsVerify(1kB msg)",
       "rustPrecompileGas": 5709,
-      "pureSolidityGas": 69960,
-      "speedup": 12.25,
+      "pureSolidityGas": 70170,
+      "speedup": 12.29,
       "note": "stub always returns true — mock values"
     },
     {

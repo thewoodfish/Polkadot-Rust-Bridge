@@ -327,7 +327,12 @@ async function runBenchmark(contract: XCMRustBridge): Promise<void> {
 
   const outPath = path.join(__dirname, "..", "benchmark-results-testnet.json");
   fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
-  console.log(`\n  Results written to benchmark-results-testnet.json\n`);
+
+  const demoOut = path.join(__dirname, "..", "demo", "src", "data", "benchmark-results-testnet.json");
+  fs.writeFileSync(demoOut, JSON.stringify(report, null, 2));
+
+  console.log(`\n  Results written to benchmark-results-testnet.json`);
+  console.log(`  Results copied  to demo/src/data/benchmark-results-testnet.json\n`);
 }
 
 function padR(s: string, n: number) { return s.padEnd(n); }

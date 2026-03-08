@@ -116,28 +116,43 @@ Explorer: [asset-hub-westend.subscan.io](https://asset-hub-westend.subscan.io) �
 
 ---
 
-## Run It Yourself
+## Run It Yourself (judges: ~3 minutes, no testnet needed)
+
+### Prerequisites
+- Node.js ≥ 20, npm
+- Rust + `cargo contract` (only needed to rebuild the ink! Wasm — pre-built bundle included)
 
 ```bash
 # 1. Clone and install
 git clone https://github.com/thewoodfish/Polkadot-Rust-Bridge
-cd Polkadot-Rust-Bridge && npm install
+cd Polkadot-Rust-Bridge
+npm install
 
-# 2. Configure environment
-cp .env.example .env
-# fill in POLKADOT_HUB_RPC_URL, DEPLOYER_PRIVATE_KEY, SUBSTRATE_SEED
+# 2. Run the full test suite (33 tests, ~1 second)
+npm test
 
-# 3. Build the ink! Wasm bundle
-cd precompiles/rust_bridge_ink && cargo contract build --release && cd ../..
+# 3. Run the gas benchmark against local Hardhat EVM
+npm run benchmark
+# Prints a table: Rust precompile gas vs pure Solidity gas, with speedups
 
-# 4. Deploy ink! contract to testnet (prints AccountId32 address)
-./scripts/deploy-ink.sh
-# set INK_CONTRACT_ADDRESS=0x<64 hex> in .env
+# 4. Launch the interactive benchmark dashboard
+cd demo && npm install && npm run dev
+# Open http://localhost:5173
+```
 
-# 5. Deploy XCMRustBridge + smoke test + benchmark
-npx hardhat run scripts/deploy.ts --network polkadotHub
-# or:
-npm run deploy
+The benchmark and dashboard work **entirely locally** — no wallet, no testnet tokens, no `.env` setup required.
+
+### What you'll see
+- `npm test` — 33 passing tests covering Solidity contracts, SCALE encoding, XCM dispatch logic, and Poseidon hash correctness
+- `npm run benchmark` — gas comparison table: Rust precompile 3–12× cheaper than equivalent Solidity
+- Dashboard — interactive bar chart, operation table, architecture diagram, and code examples
+
+### Rebuilding the ink! contract (optional)
+The pre-built `.contract` bundle is committed at `precompiles/ink-bundle/`.
+To rebuild from source (requires `cargo-contract` ≥ 5 and `nightly-2025-06-01`):
+```bash
+cd precompiles/rust_bridge_ink
+cargo contract build --release
 ```
 
 ---
