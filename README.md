@@ -165,7 +165,7 @@ Polkadot-Rust-Bridge/
 │       └── benchmark-results-testnet.json  # Live Paseo Asset Hub results
 │
 ├── docs/
-│   └── ARCHITECTURE.md          # In-depth architecture, ABI conventions, extensibility guide
+│   └── architecture.md          # In-depth architecture, ABI conventions, extensibility guide
 │
 ├── hardhat.config.ts            # Network: Paseo Asset Hub (chainId 420420417)
 ├── benchmark-results.json       # Latest local benchmark output
@@ -216,7 +216,7 @@ This is because `inkEvmAddress()` computes `address(uint160(uint256(bytes32)))`,
 4. Add a mock implementation to `contracts/mocks/MockPrecompile.sol` for local testing
 5. Add tests in `tests/RustBridge.test.ts`
 
-See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for a complete step-by-step guide.
+See [`docs/ARCHITECTURE.md`](./docs/architecture.md) for a complete step-by-step guide.
 
 ---
 
@@ -281,7 +281,7 @@ cargo contract build --release
 
 ## Documentation
 
-- [Architecture & Design Decisions](./docs/ARCHITECTURE.md) — call-flow diagram, ABI conventions, benchmark methodology, how to add precompiles
+- [Architecture & Design Decisions](./docs/architecture.md) — call-flow diagram, ABI conventions, benchmark methodology, how to add precompiles
 - [Live Dashboard](https://polkadot-rust-bridge.vercel.app) — interactive benchmark chart, architecture diagram, code examples
 - [Benchmark Data (local)](./benchmark-results.json) · [Benchmark Data (testnet)](./benchmark-results-testnet.json)
 
