@@ -5,6 +5,7 @@
 ![Solidity 0.8.24](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)
 ![Rust 2021](https://img.shields.io/badge/Rust-2021_edition-f74c00?logo=rust)
 ![Polkadot Hub](https://img.shields.io/badge/Polkadot-Hub-E6007A?logo=polkadot)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-polkadot--rust--bridge.vercel.app-brightgreen)](https://polkadot-rust-bridge.vercel.app)
 
 Polkadot Rust Bridge demonstrates how Solidity contracts on `pallet-revive` can
 delegate expensive cryptographic work to Rust code compiled for PolkaVM's
@@ -176,7 +177,7 @@ cargo contract build --release
 | Team name | _your team name_ |
 | Track | Polkadot PolkaVM / Smart Contracts |
 | Repo | https://github.com/thewoodfish/Polkadot-Rust-Bridge |
-| Demo | _hosted URL or `npm run dev` locally_ |
+| Demo | https://polkadot-rust-bridge.vercel.app |
 | Contact | _email or Telegram_ |
 
 ---
