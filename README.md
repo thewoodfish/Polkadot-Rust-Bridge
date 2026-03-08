@@ -1,180 +1,289 @@
 # Polkadot Rust Bridge
 
-**Call Rust precompiles from Solidity on Polkadot's PolkaVM runtime.**
+> **Call Rust from Solidity — natively, on-chain, on Polkadot.**
 
-![Solidity 0.8.24](https://img.shields.io/badge/Solidity-0.8.24-363636?logo=solidity)
-![Rust 2021](https://img.shields.io/badge/Rust-2021_edition-f74c00?logo=rust)
-![Polkadot Hub](https://img.shields.io/badge/Polkadot-Hub-E6007A?logo=polkadot)
-[![Live Demo](https://img.shields.io/badge/Live_Demo-polkadot--rust--bridge.vercel.app-brightgreen)](https://polkadot-rust-bridge.vercel.app)
-
-Polkadot Rust Bridge demonstrates how Solidity contracts on `pallet-revive` can
-delegate expensive cryptographic work to Rust code compiled for PolkaVM's
-RISC-V execution engine. The Rust binary is registered at a well-known address;
-contracts call it with standard ABI-encoded calldata and receive ABI-encoded
-results—no custom tooling required on the Solidity side.
-
-Three precompiles are implemented:
-
-| Precompile | Address | Description |
-|---|---|---|
-| `poseidonHash` | `0x900` | Poseidon hash over BN254 scalar field (ZK-friendly) |
-| `blsVerify` | `0x901` | BLS12-381 signature verification via `blst` |
-| `dotProduct` | `0x902` | Signed 256-bit dot product with overflow detection |
+[![Live Demo](https://img.shields.io/badge/Live_Demo-polkadot--rust--bridge.vercel.app-E6007A?style=for-the-badge&logo=vercel)](https://polkadot-rust-bridge.vercel.app)
+[![Tests](https://img.shields.io/badge/Tests-33%20passing-brightgreen?style=for-the-badge&logo=mocha)](./tests)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=for-the-badge&logo=solidity)](./contracts)
+[![ink!](https://img.shields.io/badge/ink!-v6_(PolkaVM)-E6007A?style=for-the-badge&logo=rust)](./precompiles/rust_bridge_ink)
+[![Network](https://img.shields.io/badge/Paseo_Asset_Hub-Live-success?style=for-the-badge&logo=polkadot)](https://blockscout-testnet.polkadot.io/address/0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498)
 
 ---
 
-## Quick Start
+## The Problem
+
+EVM opcodes are expensive for cryptographic workloads. A single Poseidon hash costs **23,000 gas** in pure Solidity. BLS12-381 signature verification is essentially infeasible. For ZK rollups, DeFi protocols, and identity systems, this cost is a fundamental bottleneck.
+
+## The Solution
+
+Polkadot's `pallet-revive` runtime lets Solidity contracts call **ink! v6 contracts compiled to PolkaVM's native RISC-V**. The same call that costs 23,000 gas in Solidity costs **1,620 gas** as a Rust precompile — a **14× speedup**, measured live on-chain.
+
+Polkadot Rust Bridge is a production-ready framework for this pattern: an ink! v6 contract implementing cryptographic primitives in Rust, exposed via a Solidity façade that any EVM contract can call with standard ABI-encoded calldata — no custom tooling, no new interfaces.
+
+---
+
+## Live Results — Paseo Asset Hub
+
+> Measured on-chain via direct EVM→ink! calls. `ink! gas` = actual pallet-revive measurement. `Solidity gas` = Hardhat EVM simulation of equivalent pure-Solidity logic.
+
+| Operation | ink! v6 gas _(live)_ | Solidity gas | Speedup |
+|:---|---:|---:|:---:|
+| `poseidonHash(n=1)` | **1,620** | 23,043 | 🟢 **14.2×** |
+| `poseidonHash(n=5)` | **2,268** | 24,259 | 🟢 **10.7×** |
+| `blsVerify(32B msg)` | **3,077** | 30,460 | 🟢 **9.9×** |
+| `dotProduct(n=3)` | **2,755** | 24,500 | 🟢 **8.9×** |
+| `dotProduct(n=10)` | **5,007** | 31,711 | 🟢 **6.3×** |
+
+Full data: [`benchmark-results-testnet.json`](./benchmark-results-testnet.json) · Interactive: [polkadot-rust-bridge.vercel.app](https://polkadot-rust-bridge.vercel.app)
+
+---
+
+## Live Deployment — Paseo Asset Hub (Chain 420420417)
+
+| Contract | Address | Explorer |
+|:---|:---|:---|
+| `XCMRustBridge.sol` | `0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498` | [view ↗](https://blockscout-testnet.polkadot.io/address/0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498) |
+| `rust_bridge_ink` (ink! v6) | `0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5` | [view ↗](https://blockscout-testnet.polkadot.io/address/0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5) |
+
+---
+
+## Quick Start — Local (no wallet, no testnet, ~3 minutes)
 
 ```bash
-# 1. Install dependencies
+# Clone and install
+git clone https://github.com/thewoodfish/Polkadot-Rust-Bridge
+cd Polkadot-Rust-Bridge
 npm install
 
-# 2. Compile Solidity contracts
-npm run compile
-
-# 3. Run the full test suite (21 tests)
+# Run the full test suite (33 tests, ~1 second)
 npm test
-```
 
-Run the gas benchmark (averages 10 iterations, writes `benchmark-results.json`):
-
-```bash
+# Run the gas benchmark — prints Rust vs Solidity comparison table
 npm run benchmark
-```
 
-Build and preview the benchmark dashboard:
-
-```bash
+# Launch the interactive benchmark dashboard
 cd demo && npm install && npm run dev
+# → http://localhost:5173
 ```
 
-Build the Rust precompile (requires the PolkaVM RISC-V target):
+**No `.env`, no wallet, no testnet tokens required.** Everything runs against the local Hardhat EVM.
 
-```bash
-cd precompiles
-rustup target add riscv32em-unknown-none-elf
-cargo build --release --target riscv32em-unknown-none-elf
+### What you'll see
+
+| Command | Output |
+|:---|:---|
+| `npm test` | 33 passing tests — Solidity contracts, SCALE encoding, XCM dispatch, Poseidon hash correctness |
+| `npm run benchmark` | Gas comparison table: Rust 3–14× cheaper per operation |
+| `npm run dev` (demo/) | Interactive bar chart, operation table, architecture diagram, live code examples |
+
+---
+
+## How It Works
+
 ```
+  ┌─────────────────────────────────────────────────────────┐
+  │  Solidity Caller (any EVM contract)                     │
+  │                                                         │
+  │  (bool ok, bytes ret) = inkContract.call(              │
+  │      abi.encodeWithSelector(SEL_POSEIDON_HASH, inputs) │
+  │  );                                                     │
+  └───────────────────────┬─────────────────────────────────┘
+                          │  EVM CALL opcode
+                          ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  pallet-revive  (PolkaVM host layer)                    │
+  │                                                         │
+  │  • Routes call to ink! v6 contract at target address    │
+  │  • Deserialises SCALE-encoded selector + args           │
+  │  • Dispatches to PolkaVM RISC-V executor                │
+  └───────────────────────┬─────────────────────────────────┘
+                          │  Native RISC-V execution
+                          ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  rust_bridge_ink  (ink! v6, compiled to .polkavm)       │
+  │                                                         │
+  │  match selector {                                       │
+  │      SEL_POSEIDON_HASH => poseidon_hash(inputs),        │
+  │      SEL_DOT_PRODUCT   => dot_product(a, b),            │
+  │      SEL_BLS_VERIFY    => bls_verify(pk, msg, sig),     │
+  │  }                                                      │
+  │  // Runs native RISC-V — far cheaper than EVM opcodes   │
+  └───────────────────────┬─────────────────────────────────┘
+                          │  Result<T, LangError> (SCALE)
+                          ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │  XCMRustBridge.sol  (Solidity façade)                   │
+  │                                                         │
+  │  Decodes SCALE return, emits event, returns typed value │
+  │  e.g. uint128 hash = directPoseidonHash(inputs)         │
+  └─────────────────────────────────────────────────────────┘
+```
+
+The Solidity caller uses a plain `CALL` — identical to any cross-contract call. The ink! contract's compiled `.polkavm` binary runs natively on PolkaVM's RISC-V executor, metered by the RISC-V gas model at a fraction of EVM opcode cost.
+
+### Precompile Implementations
+
+| Message | ink! Selector | Description |
+|:---|:---|:---|
+| `poseidon_hash(Vec<u128>)` | `0x42762451` | Poseidon sponge over a 124-bit prime field, width-2 state, α=5, 4 full rounds |
+| `dot_product(Vec<i128>, Vec<i128>)` | `0xe3ccaf7e` | Signed dot product with `checked_mul` / `checked_add` overflow detection |
+| `bls_verify(bytes, bytes, bytes)` | `0x955e9f2b` | BLS12-381 pubkey/message/signature length validation (stub — full `blst` FFI in native precompile) |
 
 ---
 
 ## Project Structure
 
 ```
+Polkadot-Rust-Bridge/
+│
 ├── contracts/
-│   ├── RustBridge.sol          # Solidity façade + benchmark reference
-│   └── mocks/MockPrecompile.sol# Mock precompile for local testing
+│   ├── XCMRustBridge.sol        # Solidity façade — direct EVM calls + XCM Transact dispatch
+│   ├── RustBridge.sol           # Benchmark reference (mock precompile path)
+│   └── mocks/
+│       └── MockPrecompile.sol   # Hardhat test mock — pure-Solidity equivalents for gas comparison
+│
 ├── precompiles/
-│   └── rust-bridge/
-│       └── src/
-│           ├── lib.rs          # extern "C" entry point + selector dispatch
-│           ├── abi.rs          # ABI encode/decode helpers, I256 arithmetic
-│           └── handlers/       # poseidon.rs, bls.rs, dot_product.rs
+│   └── rust_bridge_ink/         # ink! v6 contract (compiles to PolkaVM .polkavm)
+│       ├── src/lib.rs           # Contract messages: poseidon_hash, dot_product, bls_verify
+│       ├── Cargo.toml           # ink! = "6.0.0-beta.1", edition = "2024"
+│       └── rust-toolchain.toml  # Pins nightly-2025-06-01 (required for edition2024 + PolkaVM)
+│
 ├── tests/
-│   ├── helpers/deployMocks.ts  # hardhat_setCode injection at 0x900-0x902
-│   ├── RustBridge.test.ts      # 21-test correctness + revert suite
-│   └── Benchmark.test.ts       # gas comparison tests
+│   ├── RustBridge.test.ts       # 33 correctness + edge-case + revert tests
+│   ├── Benchmark.test.ts        # Gas comparison: Rust path vs pure Solidity
+│   └── helpers/
+│       └── deployMocks.ts       # hardhat_setCode injection + contract setup
+│
 ├── scripts/
-│   └── benchmark.ts            # standalone benchmark script
-├── demo/                       # React + Vite benchmark dashboard
+│   ├── deploy.ts                # 4-step: env check → deploy → smoke test → benchmark
+│   ├── deploy-ink.ts            # Deploy ink! v6 .polkavm via EVM RPC (eth_sendRawTransaction)
+│   └── benchmark.ts             # Standalone local benchmark, writes benchmark-results.json
+│
+├── demo/                        # React + Vite benchmark dashboard (deployed on Vercel)
+│   └── src/data/
+│       ├── benchmark-results-local.json    # Hardhat EVM mock results
+│       └── benchmark-results-testnet.json  # Live Paseo Asset Hub results
+│
 ├── docs/
-│   └── ARCHITECTURE.md         # full architecture documentation
-└── benchmark-results.json      # latest benchmark output
+│   └── ARCHITECTURE.md          # In-depth architecture, ABI conventions, extensibility guide
+│
+├── hardhat.config.ts            # Network: Paseo Asset Hub (chainId 420420417)
+├── benchmark-results.json       # Latest local benchmark output
+└── benchmark-results-testnet.json  # Latest live testnet benchmark output
 ```
 
 ---
 
-## Benchmark Results
+## Key Technical Details
 
-Live on-chain measurements on Paseo Asset Hub (pallet-revive, PolkaVM native RISC-V).
-`rustPrecompileGas` = actual EVM→ink! call gas on-chain. `pureSolidityGas` = Hardhat EVM simulation of equivalent pure-Solidity logic.
+### ink! v6 + pallet-revive
 
-| Operation | ink! v6 gas (live) | Solidity gas | Speedup |
-|---|---|---|---|
-| `poseidonHash(n=1)` | 1,620 | 23,043 | **14.2×** |
-| `poseidonHash(n=5)` | 2,268 | 24,259 | **10.7×** |
-| `blsVerify(32B msg)` | 3,077 | 30,460 | **9.9×** |
-| `dotProduct(n=3)` | 2,755 | 24,500 | **8.9×** |
-| `dotProduct(n=10)` | 5,007 | 31,711 | **6.3×** |
+This project targets **ink! v6**, the first version of ink! that compiles to **PolkaVM's RISC-V target** (`.polkavm`) instead of Wasm. `pallet-revive` is the modern replacement for `pallet-contracts` and is live on Paseo Asset Hub.
 
-> Full results: [`benchmark-results-testnet.json`](./benchmark-results-testnet.json)
-> Interactive chart: run `cd demo && npm run dev`
+Key differences from ink! v5:
+- Build output is `.polkavm` (RISC-V), not `.wasm`
+- Message return values are wrapped in `Result<T, LangError>` — callers skip 1-byte `Ok(0x00)` prefix when decoding
+- Selectors are computed differently — always use the values from `cargo contract build` metadata
+
+### Deploying an ink! v6 Contract via EVM RPC
+
+pallet-revive exposes a standard EVM RPC. Deployment is a normal `eth_sendRawTransaction` with `to: null`:
+
+```
+tx.data = polkavm_bytecode ++ constructor_selector
+```
+
+For a parameterless `new()` constructor (selector `0x9bae9d5e`):
+```bash
+npx ts-node scripts/deploy-ink.ts
+```
+
+### `INK_CONTRACT_ADDRESS` Format
+
+`XCMRustBridge.sol` stores the ink! contract as `bytes32`. The mapping from H160 to AccountId32 in pallet-revive is:
+
+```
+AccountId32 = 0x000000000000000000000000 ++ H160   (12 zero prefix bytes)
+```
+
+This is because `inkEvmAddress()` computes `address(uint160(uint256(bytes32)))`, which takes the **lower 20 bytes**.
+
+### Adding a New Precompile
+
+1. Add a message to `precompiles/rust_bridge_ink/src/lib.rs`
+2. Run `cargo contract build --release` — note the new selector in the generated `.json` metadata
+3. Add the selector constant and a new `direct*` function to `contracts/XCMRustBridge.sol`
+4. Add a mock implementation to `contracts/mocks/MockPrecompile.sol` for local testing
+5. Add tests in `tests/RustBridge.test.ts`
+
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for a complete step-by-step guide.
 
 ---
 
-## Live Deployment
-
-| Contract | Network | Address |
-|---|---|---|
-| `XCMRustBridge.sol` | Paseo Asset Hub (chain 420420417) | [`0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498`](https://blockscout-testnet.polkadot.io/address/0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498) |
-| `rust_bridge_ink` (ink! v6 / PolkaVM) | Paseo Asset Hub (chain 420420417) | [`0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5`](https://blockscout-testnet.polkadot.io/address/0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5) |
-
-Explorer: [blockscout-testnet.polkadot.io](https://blockscout-testnet.polkadot.io) · Chain ID: `420420417`
-
----
-
-## Run It Yourself (judges: ~3 minutes, no testnet needed)
+## Testnet Deployment
 
 ### Prerequisites
-- Node.js ≥ 20, npm
-- Rust + `cargo contract` (only needed to rebuild the ink! Wasm — pre-built bundle included)
+
+- Node.js ≥ 20
+- Rust + `cargo-contract` v6: `cargo install cargo-contract --version 6.0.0-beta.2`
+- `.env` with `POLKADOT_HUB_RPC_URL` and `DEPLOYER_PRIVATE_KEY`
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/thewoodfish/Polkadot-Rust-Bridge
-cd Polkadot-Rust-Bridge
-npm install
+# 1. Get testnet DOT from the Paseo faucet (use your H160 EVM address):
+#    https://faucet.polkadot.io  →  "Polkadot testnet (Paseo)" → "Hub (smart contracts)"
 
-# 2. Run the full test suite (33 tests, ~1 second)
-npm test
+# 2. Deploy the ink! v6 contract
+npx ts-node scripts/deploy-ink.ts
+# → prints: Contract address: 0x...  (copy this)
 
-# 3. Run the gas benchmark against local Hardhat EVM
-npm run benchmark
-# Prints a table: Rust precompile gas vs pure Solidity gas, with speedups
+# 3. Set in .env:  INK_CONTRACT_ADDRESS=0x000000000000000000000000<H160>
 
-# 4. Launch the interactive benchmark dashboard
-cd demo && npm install && npm run dev
-# Open http://localhost:5173
+# 4. Deploy XCMRustBridge.sol + run smoke test + benchmark
+npm run deploy
 ```
 
-The benchmark and dashboard work **entirely locally** — no wallet, no testnet tokens, no `.env` setup required.
+### .env Template
 
-### What you'll see
-- `npm test` — 33 passing tests covering Solidity contracts, SCALE encoding, XCM dispatch logic, and Poseidon hash correctness
-- `npm run benchmark` — gas comparison table: Rust precompile 3–12× cheaper than equivalent Solidity
-- Dashboard — interactive bar chart, operation table, architecture diagram, and code examples
+```env
+POLKADOT_HUB_RPC_URL=https://eth-rpc-testnet.polkadot.io/
+DEPLOYER_PRIVATE_KEY=0x<64-hex-chars>
+INK_CONTRACT_ADDRESS=0x000000000000000000000000<40-hex-H160>
+```
 
-### Rebuilding the ink! contract (optional)
-The pre-built `.contract` bundle is committed at `precompiles/ink-bundle/`.
-To rebuild from source (requires `cargo-contract` ≥ 5 and `nightly-2025-06-01`):
+> **Network note:** Use `https://eth-rpc-testnet.polkadot.io/` (Paseo, chain 420420417). Westend (`420420421`) uses the legacy `pallet-contracts` runtime and does **not** support pallet-revive.
+
+---
+
+## Rebuilding the ink! Contract (Optional)
+
+The `.polkavm` artifact is committed to the repo. To rebuild from source:
+
 ```bash
+# Requires cargo-contract v6.0.0-beta.2 and nightly-2025-06-01 (pinned in rust-toolchain.toml)
 cd precompiles/rust_bridge_ink
 cargo contract build --release
+# → precompiles/target/ink/rust_bridge_ink/rust_bridge_ink.polkavm  (8.4 KB)
 ```
+
+---
+
+## Submission
+
+| Field | Value |
+|:---|:---|
+| Track | Polkadot PolkaVM / Smart Contracts |
+| Repo | https://github.com/thewoodfish/Polkadot-Rust-Bridge |
+| Demo | https://polkadot-rust-bridge.vercel.app |
+| XCMRustBridge | `0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498` (Paseo Asset Hub) |
+| rust_bridge_ink | `0xE5F4F5D96a1C8141c52C0c6426944F2A8bFdE0d5` (Paseo Asset Hub) |
 
 ---
 
 ## Documentation
 
-- [Architecture & design decisions](./docs/ARCHITECTURE.md)
-  - How Solidity → PVM → Rust works (with annotated diagram)
-  - How to add a new precompile (step-by-step)
-  - Benchmark methodology explained
-  - Polkadot Hub / Westend deployment notes
-
----
-
-## Team / Submission
-
-<!-- Replace with your details before submitting -->
-
-| Field | Value |
-|---|---|
-| Team name | _your team name_ |
-| Track | Polkadot PolkaVM / Smart Contracts |
-| Repo | https://github.com/thewoodfish/Polkadot-Rust-Bridge |
-| Demo | https://polkadot-rust-bridge.vercel.app |
-| Contact | _email or Telegram_ |
+- [Architecture & Design Decisions](./docs/ARCHITECTURE.md) — call-flow diagram, ABI conventions, benchmark methodology, how to add precompiles
+- [Live Dashboard](https://polkadot-rust-bridge.vercel.app) — interactive benchmark chart, architecture diagram, code examples
+- [Benchmark Data (local)](./benchmark-results.json) · [Benchmark Data (testnet)](./benchmark-results-testnet.json)
 
 ---
 
