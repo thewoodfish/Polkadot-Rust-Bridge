@@ -284,13 +284,8 @@ async function runBenchmark(contract: XCMRustBridge): Promise<void> {
     "length check only (stub) — 32-byte message"
   );
 
-  // --- xcm Transact path (fire-and-forget, gas only) ---
-  await measure(
-    "xcmDotProduct(n=3)",
-    () => contract.dotProduct([1n, 2n, 3n], [4n, 5n, 6n]),
-    "xcm",
-    "XCM Transact dispatch — result via event (no sync return)"
-  );
+  // Note: XCM Transact path not benchmarked here — pallet-revive does not
+  // expose pallet-contracts extrinsics; direct EVM→ink! calls are the supported path.
 
   // Print table
   const COL = [36, 8, 14, 14, 14];

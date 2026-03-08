@@ -206,9 +206,10 @@ contract XCMRustBridge {
     // or inspect the generated metadata.json after `cargo contract build`.
     //
     // These values are computed from the rust_bridge_ink contract in this repo:
-    bytes4 public constant SEL_POSEIDON_HASH = 0xcaa2e7e4; // blake2b("poseidon_hash")[0..4]
-    bytes4 public constant SEL_DOT_PRODUCT   = 0x3b6d6e78; // blake2b("dot_product")[0..4]
-    bytes4 public constant SEL_BLS_VERIFY    = 0xe4428e53; // blake2b("bls_verify")[0..4]
+    // ink! v6 selectors (from rust_bridge_ink.json after cargo contract build)
+    bytes4 public constant SEL_POSEIDON_HASH = 0x42762451;
+    bytes4 public constant SEL_DOT_PRODUCT   = 0xe3ccaf7e;
+    bytes4 public constant SEL_BLS_VERIFY    = 0x955e9f2b;
 
     // pallet-contracts call index on Westend / Polkadot Asset Hub.
     // Verify against the chain's runtime metadata before deploying:
@@ -330,7 +331,8 @@ contract XCMRustBridge {
             SCALEEncoder.encodeVecU128(_toMemory(inputs))
         );
         bytes memory ret = _directCall(callData);
-        result = SCALEEncoder.decodeU128LE(ret, 0);
+        // ink! v6 wraps return in Result<T, LangError>: skip 1-byte Ok prefix (0x00)
+        result = SCALEEncoder.decodeU128LE(ret, 1);
         emit PoseidonHash(inputs, result);
     }
 
@@ -344,7 +346,8 @@ contract XCMRustBridge {
             SCALEEncoder.encodeVecI128(_toMemoryI(b))
         );
         bytes memory ret = _directCall(_encodeInkCall(SEL_DOT_PRODUCT, args));
-        result = SCALEEncoder.decodeI128LE(ret, 0);
+        // ink! v6 wraps return in Result<T, LangError>: skip 1-byte Ok prefix (0x00)
+        result = SCALEEncoder.decodeI128LE(ret, 1);
         emit DotProduct(a, b, result);
     }
 
@@ -360,7 +363,8 @@ contract XCMRustBridge {
             SCALEEncoder.encodeBytes(sig)
         );
         bytes memory ret = _directCall(_encodeInkCall(SEL_BLS_VERIFY, args));
-        result = SCALEEncoder.decodeBool(ret, 0);
+        // ink! v6 wraps return in Result<T, LangError>: skip 1-byte Ok prefix (0x00)
+        result = SCALEEncoder.decodeBool(ret, 1);
         emit BlsVerify(result);
     }
 

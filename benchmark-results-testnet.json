@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-03-08T17:20:53.538Z",
+  "network": "polkadotHub",
+  "runs": 5,
+  "results": [
+    {
+      "operation": "directDotProduct(n=3)",
+      "path": "direct",
+      "avgGas": 2755,
+      "minGas": 2751,
+      "maxGas": 2756,
+      "note": "synchronous EVM→ink! call, n=3 elements"
+    },
+    {
+      "operation": "directDotProduct(n=10)",
+      "path": "direct",
+      "avgGas": 5007,
+      "minGas": 5003,
+      "maxGas": 5008,
+      "note": "synchronous EVM→ink! call, n=10 elements"
+    },
+    {
+      "operation": "directPoseidonHash(n=1)",
+      "path": "direct",
+      "avgGas": 1620,
+      "minGas": 1620,
+      "maxGas": 1620,
+      "note": "synchronous EVM→ink! call, n=1 element"
+    },
+    {
+      "operation": "directPoseidonHash(n=5)",
+      "path": "direct",
+      "avgGas": 2268,
+      "minGas": 2268,
+      "maxGas": 2268,
+      "note": "synchronous EVM→ink! call, n=5 elements"
+    },
+    {
+      "operation": "directBlsVerify(32B msg)",
+      "path": "direct",
+      "avgGas": 3077,
+      "minGas": 3073,
+      "maxGas": 3078,
+      "note": "length check only (stub) — 32-byte message"
+    }
+  ]
+}

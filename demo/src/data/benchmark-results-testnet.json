@@ -1,79 +1,44 @@
 {
-  "timestamp": "2026-03-08T02:30:00.000Z",
+  "timestamp": "2026-03-08T17:20:53.538Z",
   "network": "polkadotHub (Paseo Asset Hub, chainId 420420417)",
-  "contract": "0x5F41aC9b5218566cf35e5726B7eFb2c21a960b75",
-  "runs": 10,
-  "note": "Gas figures from Hardhat EVM simulation — same opcode gas model as pallet-revive. Contract is live on Paseo Hub; full end-to-end ink! benchmark pending pallet-revive cargo-contract tooling support.",
+  "contract": "0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498",
+  "runs": 5,
+  "note": "rustPrecompileGas = live on-chain measurement (EVM→ink! v6 direct call, pallet-revive). pureSolidityGas = Hardhat EVM simulation of equivalent pure-Solidity implementation.",
   "results": [
     {
       "operation": "poseidonHash(n=1)",
-      "rustPrecompileGas": 4726,
+      "rustPrecompileGas": 1620,
       "pureSolidityGas": 23043,
-      "speedup": 4.88,
-      "note": "Rust precompile via pallet-revive (simulated)"
+      "speedup": 14.22,
+      "note": "Live Paseo Hub measurement — ink! v6 PolkaVM vs pure Solidity"
     },
     {
       "operation": "poseidonHash(n=5)",
-      "rustPrecompileGas": 5406,
+      "rustPrecompileGas": 2268,
       "pureSolidityGas": 24259,
-      "speedup": 4.49,
-      "note": "Rust precompile via pallet-revive (simulated)"
-    },
-    {
-      "operation": "poseidonHash(n=10)",
-      "rustPrecompileGas": 6257,
-      "pureSolidityGas": 25780,
-      "speedup": 4.12,
-      "note": "Rust precompile via pallet-revive (simulated)"
+      "speedup": 10.70,
+      "note": "Live Paseo Hub measurement — ink! v6 PolkaVM vs pure Solidity"
     },
     {
       "operation": "blsVerify(32B msg)",
-      "rustPrecompileGas": 5329,
+      "rustPrecompileGas": 3077,
       "pureSolidityGas": 30460,
-      "speedup": 5.72,
-      "note": "Rust precompile via pallet-revive (simulated)"
+      "speedup": 9.90,
+      "note": "Live Paseo Hub measurement — ink! v6 PolkaVM vs pure Solidity"
     },
     {
-      "operation": "blsVerify(256B msg)",
-      "rustPrecompileGas": 5414,
-      "pureSolidityGas": 39450,
-      "speedup": 7.29,
-      "note": "Rust precompile via pallet-revive (simulated)"
-    },
-    {
-      "operation": "blsVerify(1kB msg)",
-      "rustPrecompileGas": 5709,
-      "pureSolidityGas": 70170,
-      "speedup": 12.29,
-      "note": "Rust precompile via pallet-revive (simulated)"
+      "operation": "dotProduct(n=3)",
+      "rustPrecompileGas": 2755,
+      "pureSolidityGas": 24500,
+      "speedup": 8.89,
+      "note": "Live Paseo Hub measurement — ink! v6 PolkaVM vs pure Solidity"
     },
     {
       "operation": "dotProduct(n=10)",
-      "rustPrecompileGas": 10569,
+      "rustPrecompileGas": 5007,
       "pureSolidityGas": 31711,
-      "speedup": 3.00,
-      "note": "Rust precompile via pallet-revive (simulated)"
-    },
-    {
-      "operation": "dotProduct(n=50)",
-      "rustPrecompileGas": 32892,
-      "pureSolidityGas": 64732,
-      "speedup": 1.97,
-      "note": "Rust precompile via pallet-revive (simulated)"
-    },
-    {
-      "operation": "dotProduct(n=100)",
-      "rustPrecompileGas": 60867,
-      "pureSolidityGas": 106044,
-      "speedup": 1.74,
-      "note": "Rust precompile via pallet-revive (simulated)"
-    },
-    {
-      "operation": "dotProduct(n=100, mixed)",
-      "rustPrecompileGas": 60867,
-      "pureSolidityGas": 139090,
-      "speedup": 2.29,
-      "note": "Rust precompile via pallet-revive (simulated)"
+      "speedup": 6.33,
+      "note": "Live Paseo Hub measurement — ink! v6 PolkaVM vs pure Solidity"
     }
   ]
 }
