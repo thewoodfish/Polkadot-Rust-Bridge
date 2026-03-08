@@ -1,0 +1,12 @@
+{
+  "network": "polkadotHub",
+  "chainId": "420420417",
+  "deployedAt": "2026-03-08T02:00:00.000Z",
+  "deployer": "0xca9D5Da439731a99657b659d6E3554375859f64c",
+  "contracts": {
+    "XCMRustBridge": "0x5F41aC9b5218566cf35e5726B7eFb2c21a960b75"
+  },
+  "inkContract": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "rpc": "https://eth-rpc-testnet.polkadot.io/",
+  "explorer": "https://blockscout-testnet.polkadot.io"
+}

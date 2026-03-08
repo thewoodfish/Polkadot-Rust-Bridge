@@ -1,9 +1,9 @@
 {
   "testnet": {
-    "network":       "Polkadot Hub Testnet (Westend Asset Hub)",
-    "chainId":       420420421,
-    "explorer":      "https://asset-hub-westend.subscan.io",
-    "xcmRustBridge": "",
+    "network":       "Polkadot Hub Testnet (Paseo Asset Hub)",
+    "chainId":       420420417,
+    "explorer":      "https://blockscout-testnet.polkadot.io",
+    "xcmRustBridge": "0x5F41aC9b5218566cf35e5726B7eFb2c21a960b75",
     "inkContract":   ""
   }
 }

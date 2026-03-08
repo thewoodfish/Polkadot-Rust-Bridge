@@ -32,14 +32,14 @@ const config: HardhatUserConfig = {
       accounts: process.env.DEPLOYER_PRIVATE_KEY
                   ? [process.env.DEPLOYER_PRIVATE_KEY]
                   : [],
-      chainId:  420420417,
+      chainId:  420420421,
     },
     polkadotHubTestnet: {
       url:      process.env.POLKADOT_HUB_RPC_URL ?? "",
       accounts: process.env.DEPLOYER_PRIVATE_KEY
                   ? [process.env.DEPLOYER_PRIVATE_KEY]
                   : [],
-      chainId:  420420417,
+      chainId:  420420421,
     },
   },
 };
