@@ -1,12 +1,23 @@
 # Polkadot Rust Bridge
 
 > **Call Rust from Solidity — natively, on-chain, on Polkadot.**
+> The standard pattern for PolkaVM precompiles: 3–14× cheaper gas, zero ABI changes, live on Paseo Asset Hub today.
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-polkadot--rust--bridge.vercel.app-E6007A?style=for-the-badge&logo=vercel)](https://polkadot-rust-bridge.vercel.app)
 [![Tests](https://img.shields.io/badge/Tests-33%20passing-brightgreen?style=for-the-badge&logo=mocha)](./tests)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=for-the-badge&logo=solidity)](./contracts)
 [![ink!](https://img.shields.io/badge/ink!-v6_(PolkaVM)-E6007A?style=for-the-badge&logo=rust)](./precompiles/rust_bridge_ink)
 [![Network](https://img.shields.io/badge/Paseo_Asset_Hub-Live-success?style=for-the-badge&logo=polkadot)](https://blockscout-testnet.polkadot.io/address/0x0794D9FfF1f2FE27Fa0ABCFf51cf8b12C1C9f498)
+
+---
+
+## Vision
+
+**Polkadot Rust Bridge establishes the standard pattern for Rust precompiles on PolkaVM** — the same way Ethereum precompiles accelerated early DeFi, but open to every developer through familiar Solidity + Rust tooling.
+
+Today, ZK rollups, DeFi protocols, and identity systems on EVM chains pay 10–23× too much gas for cryptographic operations because EVM opcodes were never designed for these workloads. pallet-revive and PolkaVM's RISC-V executor change this equation: native Rust execution, metered at RISC-V cost, callable from any Solidity contract with zero ABI changes.
+
+This project proves the pattern is real, live, and measurable. The roadmap turns it into infrastructure that every Polkadot EVM project can depend on.
 
 ---
 
@@ -264,6 +275,32 @@ cd precompiles/rust_bridge_ink
 cargo contract build --release
 # → precompiles/target/ink/rust_bridge_ink/rust_bridge_ink.polkavm  (8.4 KB)
 ```
+
+---
+
+## Roadmap
+
+This hackathon submission is the foundation. Here is where we take it next.
+
+### Phase 1 — Precompile Library (Q2 2025)
+- [ ] **`blst` full integration** — wire the BLS12-381 FFI stub to the real `blst` crate for production-grade signature verification
+- [ ] **Pedersen commitments** — add `pedersen_commit(value, blinding)` for ZK-friendly on-chain commitments
+- [ ] **SHA3 / Keccak256** — expose native Rust Keccak as a cheaper alternative to the EVM opcode
+- [ ] **Published crate** — release `rust-bridge-ink` on crates.io so any project can import primitives without copying code
+
+### Phase 2 — Developer Tooling (Q3 2025)
+- [ ] **`cargo-bridge` CLI** — one command to scaffold a new precompile, generate Solidity bindings, and write the test stub
+- [ ] **Hardhat plugin** — auto-injects the compiled `.polkavm` bytecode at the mock address during `npx hardhat test`, removing the manual `hardhat_setCode` step
+- [ ] **ABI auto-generation** — parse ink! metadata JSON and emit matching Solidity `interface` declarations
+
+### Phase 3 — Production Readiness (Q4 2025)
+- [ ] **Mainnet deployment** — ship to Polkadot Asset Hub once pallet-revive reaches production
+- [ ] **Gas oracle integration** — on-chain helper that reports live PolkaVM vs EVM gas estimates so callers can route intelligently
+- [ ] **Security audit** — third-party audit of the bridge contract and SCALE encoding layer
+- [ ] **Reference integrations** — demonstrate the pattern in a live DeFi protocol (ZK verifier) and identity primitive (BLS multisig wallet)
+
+### Long-term Vision
+Polkadot Rust Bridge becomes the **"precompile registry"** for PolkaVM — a curated, audited set of Rust cryptographic and compute primitives that any Polkadot EVM project can call by address, the same way Ethereum developers call `0x02` (SHA-256) or `0x08` (bn256 pairing). Open source, permissionless, and maintained by the community.
 
 ---
 
